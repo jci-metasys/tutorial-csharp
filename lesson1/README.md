@@ -8,7 +8,10 @@ Dependencies:
 * Netwonsoft.Json
 
 Make sure you change your current directory to lesson 1 and 
-then run it. You should see something like the following:
+then run it. You should pass your username, your password, and 
+your hostname as shown.
+
+You should see something like the following:
 
 ```bash
 $ dotnet run myname mypassword myhostname
@@ -20,4 +23,111 @@ Unauthorized
 The code for this program is all in one file [Program.cs](./Program.cs)
 
 
+## Parse the command line arguments
 
+The first thing we do is just parse the command line arguments:
+
+```csharp
+    var username = args[0];
+    var password = args[1];
+    var hostname = args[2];
+```
+
+## Create HttpClient
+
+Next we create an HttpClient
+
+```csharp
+using (var client = new HttpClient {BaseAddress = new Uri($"https://{hostname}/api/v1")})
+{
+}
+```
+
+The key thing is that we set the BaseAddress appropriately given
+the hostname.
+
+## Login
+
+Next we construct the payload for logging in and post it to the server:
+
+```csharp
+var loginMessage = $"{{ 'username': '{username}', 'password': '{password}' }}";
+Console.WriteLine(loginMessage);
+
+var loginContent = new StringContent(loginMessage,
+    Encoding.UTF8,
+    "application/json");
+
+var loginResponseMessage = await client.PostAsync("login", loginContent);
+
+
+// Read the results
+var loginResult = await loginResponseMessage.Content.ReadAsStringAsync();
+
+// Get the access token
+// We could use string manipulation methods, but using JSON.NET is much easier
+var accessToken = JToken.Parse(loginResult)["accessToken"].Value<string>();
+Console.WriteLine(accessToken);
+```
+
+We first construct `loginMessage`. This is the payload as documented in the API. It should be a JSON message of the
+format:
+
+```json
+{
+    "username": "the user name",
+    "password": "the password"
+}
+```
+
+You'll note that we were able to use single quotes `'` instead of
+double quotes `"` around `username`, `password` and their respective values.
+
+Next we create an instance of `StringContent` and set the `Content-Type` to `application/json`.
+
+We then use the `PostAsync` method to send this conent to the server. Note we only pass the uri `login` instead of a full URL. This is because we already set the base url above.
+Also note we use the `await` keyword. This is because `PostAsync` is an asynchronous method.
+
+The result of this call is an HttpResponseMessage. If everything went okay we should be able to read
+the response using `loginResponseMessage.Content.ReadAsStringAsync()`. The response is a string that
+should look like the following
+
+```json
+{
+    "accessToken":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1N...",
+    "expires":"2018-10-24T18:27:56Z"
+}
+```
+
+The `accessToken` was truncated in the above example for formatting reasons.
+
+We want to get that access token. To do that we could use string methods, but it's much easier to use a
+JSON library like Newtonsoft: `JToken.Parse(loginResult)` returns a dictionary like object. So we can
+then lookup the access token using an indexer expression `["accessToken"]`.
+
+## Set the Authorization Header for future requests
+
+Every other request we make needs the access token in an Authorization header. So
+we set this header as follows:
+
+```csharp
+client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(accessToken);
+```
+
+## Attempt to Make Another Call
+
+Finally we attempt to make another call:
+
+```csharp
+var alarmsResponse = await client.GetAsync("alarms");
+```
+
+Notice it's much easier to make a GET call then a POST. We didn't need to format any request. We just need
+the URL fragment of the endpoint we want to call. In this case `alarms`.
+
+Unfortunately this call will return a 401 status code, Unauthorized.
+
+Why? The reason is a little complicated. First you should know that the server's response to any call is to return a redirect. These are instructions from the server to the client stating that the URL they attempted to access is at a different location. By default, HttpClient will follow these redirects automatically for you.
+But for security reasons, it strips off the Authorization header we just constructed. So the call fails.
+
+Go on to Lesson 2 where we'll demonstrate our first method for resolving this issue.
