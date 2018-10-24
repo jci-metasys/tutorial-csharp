@@ -3,9 +3,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using JohnsonControls.Net.Http;
 using Newtonsoft.Json.Linq;
 
-namespace tutorial_csharp
+namespace lesson2
 {
     public class Program
     {
@@ -16,12 +17,12 @@ namespace tutorial_csharp
             var password = args[1];
             var hostname = args[2];
 
+            var handler = new HttpClientRedirectHandler();
 
-            using (var client = new HttpClient {BaseAddress = new Uri($"https://{hostname}/api/v1")})
+            using (var client = new HttpClient(handler) {BaseAddress = new Uri($"https://{hostname}/api/v1")})
             {
                 // Login - constructing a payload that looks like { "username": "thename', "password": "thepassword" }
                 var loginMessage = $"{{ 'username': '{username}', 'password': '{password}' }}";
-                Console.WriteLine(loginMessage);
 
                 var loginContent = new StringContent(loginMessage,
                     Encoding.UTF8,
@@ -29,25 +30,24 @@ namespace tutorial_csharp
 
                 var loginResponseMessage = await client.PostAsync("login", loginContent);
 
-
                 // Read the results
                 var loginResult = await loginResponseMessage.Content.ReadAsStringAsync();
 
                 // Get the access token
                 // We could use string manipulation methods, but using JSON.NET is much easier
                 var accessToken = JToken.Parse(loginResult)["accessToken"].Value<string>();
-                Console.WriteLine(accessToken);
 
                 // Add an authorization header to the list of default headers for our client
                 client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {accessToken}");
 
+
                 // Let's attempt to retrieve the first page of alarms
                 var alarmsResponse = await client.GetAsync("alarms");
 
-                // Oops we get a 401
-                // End of lesson
-                Console.WriteLine(alarmsResponse.StatusCode);
-
+                // Parse the response using Newtonsoft and print the first one.
+                var alarmsObject = JObject.Parse(await alarmsResponse.Content.ReadAsStringAsync());
+                var alarms = alarmsObject["items"];
+                Console.WriteLine($"First alarm: {alarms?[0]}");
             }
 
 
