@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using JohnsonControls.Net.Http;
 using Newtonsoft.Json.Linq;
 
-namespace lesson2
+namespace lesson3
 {
     public class Program
     {
