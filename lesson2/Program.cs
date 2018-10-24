@@ -22,7 +22,6 @@ namespace lesson2
             {
                 // Login - constructing a payload that looks like { "username": "thename', "password": "thepassword" }
                 var loginMessage = $"{{ 'username': '{username}', 'password': '{password}' }}";
-                Console.WriteLine(loginMessage);
 
                 var loginContent = new StringContent(loginMessage,
                     Encoding.UTF8,
@@ -40,7 +39,6 @@ namespace lesson2
                 // Get the access token
                 // We could use string manipulation methods, but using JSON.NET is much easier
                 var accessToken = JToken.Parse(loginResult)["accessToken"].Value<string>();
-                Console.WriteLine(accessToken);
 
                 // Add an authorization header to the list of default headers for our client
                 client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {accessToken}");
@@ -53,6 +51,10 @@ namespace lesson2
                 // Handle the redirect
                 alarmsResponse = await client.GetAsync(alarmsResponse.Headers.Location);
 
+                // Parse the response using Newtonsoft and print the first one.
+                var alarmsObject = JObject.Parse(await alarmsResponse.Content.ReadAsStringAsync());
+                var alarms = alarmsObject["items"];
+                Console.WriteLine($"First alarm: {alarms?[0]}");
             }
 
 
