@@ -22,38 +22,37 @@ namespace tutorial_csharp
                 // Login - constructing a payload that looks like { "username": "thename', "password": "thepassword" }
                 var loginMessage = $"{{ 'username': '{username}', 'password': '{password}' }}";
                 Console.WriteLine(loginMessage);
-                
+
                 var loginContent = new StringContent(loginMessage,
                     Encoding.UTF8,
                     "application/json");
-                    
+
                 var loginResponseMessage = await client.PostAsync("login", loginContent);
-                
-                
+
+
                 // Read the results
                 var loginResult = await loginResponseMessage.Content.ReadAsStringAsync();
-                
+
                 // Get the access token
                 // We could use string manipulation methods, but using JSON.NET is much easier
                 var accessToken = JToken.Parse(loginResult)["accessToken"].Value<string>();
                 Console.WriteLine(accessToken);
-                
+
                 // Add an authorization header to the list of default headers for our client
-                client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(accessToken);
-                
+                client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {accessToken}");
 
                 // Let's attempt to retrieve the first page of alarms
                 var alarmsResponse = await client.GetAsync("alarms");
-                
+
                 // Oops we get a 401
                 // End of lesson
                 Console.WriteLine(alarmsResponse.StatusCode);
 
             }
-                
-            
+
+
 
         }
-        
+
     }
 }
