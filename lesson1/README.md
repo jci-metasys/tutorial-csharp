@@ -48,27 +48,8 @@ the hostname.
 
 ## Login
 
-Next we construct the payload for logging in and post it to the server:
-
-```csharp
-var loginMessage = $"{{ 'username': '{username}', 'password': '{password}' }}";
-Console.WriteLine(loginMessage);
-
-var loginContent = new StringContent(loginMessage,
-    Encoding.UTF8,
-    "application/json");
-
-var loginResponseMessage = await client.PostAsync("login", loginContent);
-
-
-// Read the results
-var loginResult = await loginResponseMessage.Content.ReadAsStringAsync();
-
-// Get the access token
-// We could use string manipulation methods, but using JSON.NET is much easier
-var accessToken = JToken.Parse(loginResult)["accessToken"].Value<string>();
-Console.WriteLine(accessToken);
-```
+In this section we'll see how to construct a login request, send it to the server
+and then retrieve the access token.
 
 We first construct `loginMessage`. This is the payload as documented in the API. It should be a JSON message of the
 format:
@@ -85,11 +66,28 @@ double quotes `"` around `username`, `password` and their respective values.
 
 Next we create an instance of `StringContent` and set the `Content-Type` to `application/json`.
 
+```csharp
+var loginContent = new StringContent(loginMessage,
+    Encoding.UTF8,
+    "application/json");
+```
+
 We then use the `PostAsync` method to send this conent to the server. Note we only pass the uri `login` instead of a full URL. This is because we already set the base url above.
 Also note we use the `await` keyword. This is because `PostAsync` is an asynchronous method.
 
+```csharp
+var loginResponseMessage = await client.PostAsync("login", loginContent);
+
+```
+
 The result of this call is an HttpResponseMessage. If everything went okay we should be able to read
-the response using `loginResponseMessage.Content.ReadAsStringAsync()`. The response is a string that
+the response.
+
+```csharp
+var loginResult = await loginResponseMessage.Content.ReadAsStringAsync();
+```
+
+ The response is a string that
 should look like the following
 
 ```json
@@ -102,8 +100,11 @@ should look like the following
 The `accessToken` was truncated in the above example for formatting reasons.
 
 We want to get that access token. To do that we could use string methods, but it's much easier to use a
-JSON library like Newtonsoft: `JToken.Parse(loginResult)` returns a dictionary like object. So we can
-then lookup the access token using an indexer expression `["accessToken"]`.
+JSON library like Newtonsoft. Therefore we use `JToken.Parse`
+
+```csharp
+var accessToken = JToken.Parse(loginResult)["accessToken"].Value<string>();
+```
 
 ## Set the Authorization Header for future requests
 
