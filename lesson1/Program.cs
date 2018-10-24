@@ -36,6 +36,7 @@ namespace tutorial_csharp
                 // Get the access token
                 // We could use string manipulation methods, but using JSON.NET is much easier
                 var accessToken = JToken.Parse(loginResult)["accessToken"].Value<string>();
+                Console.WriteLine(accessToken);
                 
                 // Add an authorization header to the list of default headers for our client
                 client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(accessToken);
