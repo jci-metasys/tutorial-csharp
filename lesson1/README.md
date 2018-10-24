@@ -51,8 +51,7 @@ the hostname.
 In this section we'll see how to construct a login request, send it to the server
 and then retrieve the access token.
 
-We first construct `loginMessage`. This is the payload as documented in the API. It should be a JSON message of the
-format:
+We first construct `loginMessage`. This is the payload as documented in the API. It should be a JSON message of the format:
 
 ```json
 {
@@ -61,18 +60,27 @@ format:
 }
 ```
 
+The following code fragment achieves this:
+
+```csharp
+// Construct the payload for login
+var loginMessage = $"{{ 'username': '{username}', 'password': '{password}' }}";
+```
+
 You'll note that we were able to use single quotes `'` instead of
 double quotes `"` around `username`, `password` and their respective values.
 
 Next we create an instance of `StringContent` and set the `Content-Type` to `application/json`.
 
 ```csharp
-var loginContent = new StringContent(loginMessage,
-    Encoding.UTF8,
-    "application/json");
+// Create an instance of StringContent (which is a subclass of HttpContent
+// which is what PostAsync needs below.)
+var loginContent = new StringContent(loginMessage, Encoding.UTF8, "application/json");
 ```
 
-We then use the `PostAsync` method to send this conent to the server. Note we only pass the uri `login` instead of a full URL. This is because we already set the base url above.
+We then use the `PostAsync` method to send this content to the server. Note we only pass the uri
+fragment `login` instead of a full URL. This is because we already set the base url above
+when we created the HttpClient.
 Also note we use the `await` keyword. This is because `PostAsync` is an asynchronous method.
 
 ```csharp
@@ -81,7 +89,7 @@ var loginResponseMessage = await client.PostAsync("login", loginContent);
 ```
 
 The result of this call is an HttpResponseMessage. If everything went okay we should be able to read
-the response.
+the response. Here we read it into a `string`.
 
 ```csharp
 var loginResult = await loginResponseMessage.Content.ReadAsStringAsync();
@@ -100,7 +108,8 @@ should look like the following
 The `accessToken` was truncated in the above example for formatting reasons.
 
 We want to get that access token. To do that we could use string methods, but it's much easier to use a
-JSON library like Newtonsoft. Therefore we use `JToken.Parse`
+JSON library like Newtonsoft. Therefore we use `JToken.Parse`. The following line parses the JSON,
+accesses the property named `accessToken` and converts that to a string.
 
 ```csharp
 var accessToken = JToken.Parse(loginResult)["accessToken"].Value<string>();
