@@ -121,7 +121,8 @@ Every other request we make needs the access token in an Authorization header. S
 we set this header as follows:
 
 ```csharp
-            client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {accessToken}");```
+client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {accessToken}");```
+```
 
 ## Attempt to Make Another Call
 
