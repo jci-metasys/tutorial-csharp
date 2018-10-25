@@ -40,7 +40,7 @@ namespace lesson5
 
 
                 var secondPageOfAlarms = await client.Request(alarms.Next).GetJsonAsync<AlarmCollection>();
-                Console.WriteLine(secondPageOfAlarms[1].Name);
+                Console.WriteLine($"Name of object in second alarm on second page ${secondPageOfAlarms[1].Name}");
             }
         }
     }
