@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Flurl.Http;
 using JohnsonControls.Net.Http;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace lesson4
@@ -40,20 +41,21 @@ namespace lesson4
                 // defined in the schema
 
                 var nextPageUrl = alarms.next;
-                Console.WriteLine(nextPageUrl);
+                Console.WriteLine($"The next page of alarms url: {nextPageUrl}");
 
 
                 var firstAlarmItemReference = alarms.items[0].itemReference;
-                Console.WriteLine(firstAlarmItemReference);
+                Console.WriteLine($"The item reference of the first alarm: {firstAlarmItemReference}");
 
                 var triggerValueUnits = alarms.items[0].triggerValue.units;
-                Console.WriteLine(triggerValueUnits);
+                Console.WriteLine($"The trigger value units of first alarm: {triggerValueUnits}");
 
                 // But the bad thing is if we just want to get an Alarm
                 // it doesn't work like we want
                 var firstAlarm = alarms.items[0];
-                Console.WriteLine(firstAlarm.ToString()); // Outputs "System.Dynamic.ExpandoObject"
+                Console.WriteLine($"The first alarm (oops!): {firstAlarm.ToString()}"); // Outputs "System.Dynamic.ExpandoObject"
 
+                Console.WriteLine($"The first alarm (much better): {JsonConvert.SerializeObject(firstAlarm, Formatting.Indented)}");
 
                 // So an alternative is to ues GetJsonAsync<JToken> which returns JTokens as defined
                 // by Newtonsoft. To illustrate let's fetch the alarms again
@@ -64,10 +66,10 @@ namespace lesson4
                 var alarmsCollection = alarmsObject["items"]; // Returns a JArray since items is a collection
                 var firstAlarmObject = alarmsCollection[0]; // Returns a JObject since each alarm is an object
 
-                Console.WriteLine(firstAlarmObject);
+                Console.WriteLine($"The first alarm (one more time): {firstAlarmObject}");
 
                 var firstAlarmObjectItemReference = alarmsCollection[0]["itemReference"];
-                Console.WriteLine(firstAlarmObjectItemReference);
+                Console.WriteLine($"The item reference of the first alarm: {firstAlarmObjectItemReference}");
 
             }
 

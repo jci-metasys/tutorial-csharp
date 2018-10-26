@@ -8,7 +8,8 @@ to post JSON.
 Dependencies:
 
 * .Net Core
-* HttpClientRedirectHandler.Flurl
+* [HttpClientRedirectHandler.Flurl](https://www.nuget.org/packages/HttpClientRedirectHandler.Flurl/) - source code at
+   <https://github.com/metasys-server/redirect-handler/>
 
 The following dependencies are installed as dependencies of HttpClientRedirectHandler.Flurl
 
@@ -18,35 +19,57 @@ The following dependencies are installed as dependencies of HttpClientRedirectHa
 
 The code for this program is in [Program.cs](./Program.cs).
 
-Like all the other lessons you should be able to run the app
+Like all the other lessons you should be able to run the app by supplying username, password and hostname.
+
+It will call the alarms endpoint and print out different pieces of data from the response.
 
 ```shell
 $ dotnet run -c release username password hostname
-/alarms?pageSize=100&excludePending=false&excludeAcknowledged=false&excludeDiscarded=false&page=2
-thesun:Mars3518/Field Bus MSTP1.VAV-08.DPR-O
-/enumSets/507/members/98
-System.Dynamic.ExpandoObject
-{
-  "self": "/alarms/34015016-3432-4521-83bc-61ad10b99545",
-  "id": "34015016-3432-4521-83bc-61ad10b99545",
-  "itemReference": "thesun:Mars3518/Field Bus MSTP1.VAV-08.DPR-O",
-  "name": "DPR-O",
-  "message": "",
+The next page of alarms url: /alarms?pageSize=100&excludePending=false&excludeAcknowledged=false&excludeDiscarded=false&page=2
+The item reference of the first alarm: thesun:Jupiter3410
+The trigger value units of first alarm: /enumSets/507/members/95
+The first alarm (oops!): System.Dynamic.ExpandoObject
+The first alarm (much better): {
+  "self": "/alarms/a78612cf-60c8-426a-89bb-c94b8cbe7f63",
+  "id": "a78612cf-60c8-426a-89bb-c94b8cbe7f63",
+  "itemReference": "thesun:Jupiter3410",
+  "name": "Jupiter3410",
+  "message": "thesun:Jupiter3410 is online",
   "isAckRequired": true,
-  "type": "/enumSets/108/members/66",
-  "priority": 70,
+  "type": "/enumSets/108/members/75",
+  "priority": 106,
   "triggerValue": {
-    "value": "0.0",
-    "units": "/enumSets/507/members/98"
+    "value": "",
+    "units": "/enumSets/507/members/95"
   },
-  "creationTime": "2018-10-24T23:00:22Z",
+  "creationTime": "2018-10-26T14:46:24Z",
   "isAcknowledged": false,
   "isDiscarded": false,
   "category": "/enumSets/33/members/5",
-  "object": "/objects/e6b03623-612d-5034-9c11-7f24005b31ef",
-  "annotations": "/alarms/34015016-3432-4521-83bc-61ad10b99545/annotations"
+  "object": "/objects/d750697b-5faf-5950-b071-85c0cc4c28e7",
+  "annotations": "/alarms/a78612cf-60c8-426a-89bb-c94b8cbe7f63/annotations"
 }
-thesun:Mars3518/Field Bus MSTP1.VAV-08.DPR-O
+The first alarm (one more time): {
+  "self": "/alarms/a78612cf-60c8-426a-89bb-c94b8cbe7f63",
+  "id": "a78612cf-60c8-426a-89bb-c94b8cbe7f63",
+  "itemReference": "thesun:Jupiter3410",
+  "name": "Jupiter3410",
+  "message": "thesun:Jupiter3410 is online",
+  "isAckRequired": true,
+  "type": "/enumSets/108/members/75",
+  "priority": 106,
+  "triggerValue": {
+    "value": "",
+    "units": "/enumSets/507/members/95"
+  },
+  "creationTime": "2018-10-26T14:46:24Z",
+  "isAcknowledged": false,
+  "isDiscarded": false,
+  "category": "/enumSets/33/members/5",
+  "object": "/objects/d750697b-5faf-5950-b071-85c0cc4c28e7",
+  "annotations": "/alarms/a78612cf-60c8-426a-89bb-c94b8cbe7f63/annotations"
+}
+The item reference of the first alarm: thesun:Jupiter3410
 ```
 
 ## Configure Flurl to use our HttpClient Factory
@@ -54,11 +77,10 @@ thesun:Mars3518/Field Bus MSTP1.VAV-08.DPR-O
 We are introducing a new dependency HttpClientRedirectHandler.Flurl.
 
 This package supplies one new class `HttpClientRedirectFactory` that allows
-us to inject our HttpClientRedirectHandler into the construction of Flurl clients.
-
+us to inject our `HttpClientRedirectHandler` when constructing Flurl clients.
 
 ```csharp
-FlurlHttp.Configure(settings => 
+FlurlHttp.Configure(settings =>
   settings.HttpClientFactory = new HttpClientRedirectFactory());
 ```
 
@@ -85,18 +107,18 @@ using (var client = new FlurlClient($"https://{hostname}/api/v1"))
 Some things to note.
 
 * Note we are now creating a FlurlClient rather than an HttpClient. Flurl
-provides us with some methods to make it easier to deal with requests and responses.
+  provides us with some methods to make it easier to deal with requests and responses.
 
 * Notice that we construct
-a C# anonymous object with username and password properties and pass that to 
-`PostJsonAsync`. The method takes care to convert it into JSON for us. This is
-a little easier than formating JSON in a string literal.
+  a C# anonymous object with username and password properties and pass that to
+  `PostJsonAsync`. The method takes care to convert it into JSON for us. This is
+  a little easier than formating JSON in a string literal.
 
 * Also we use the `ReceiveJson` method to have the result parsed and returned
-as a dynamic object (actually an [ExpandoObject](https://stackoverflow.com/questions/1653046/what-are-the-true-benefits-of-expandoobject#1663044)).
-See the linked article for more details or search MSDN. In a nutshell, we can
-query the response object using dynamic properties. That is how we are able
-to get the access token using `loginResult.accessToken`.
+  as a dynamic object (actually an [ExpandoObject](https://stackoverflow.com/questions/1653046/what-are-the-true-benefits-of-expandoobject#1663044)).
+  See the linked article for more details or search MSDN. In a nutshell, we can
+  query the response object using dynamic properties. That is how we are able
+  to get the access token using `loginResult.accessToken`.
 
 ## Create a new Flurl Client with Authorization Header set
 
@@ -109,6 +131,7 @@ header set properly.
 using (var client = new FlurlClient($"https://{hostname}/api/v1")
   .WithOAuthBearerToken(accessToken))
 {
+  ...
 }
 ```
 
@@ -126,19 +149,18 @@ var alarms = await client.Request("alarms").GetJsonAsync();
 // defined in the schema
 
 var nextPageUrl = alarms.next;
-Console.WriteLine(nextPageUrl);
-
+Console.WriteLine($"The next page of alarms url: {nextPageUrl}");
 
 var firstAlarmItemReference = alarms.items[0].itemReference;
-Console.WriteLine(firstAlarmItemReference);
+Console.WriteLine($"The item reference of the first alarm: {firstAlarmItemReference}");
 
 var triggerValueUnits = alarms.items[0].triggerValue.units;
-Console.WriteLine(triggerValueUnits);
+Console.WriteLine($"The trigger value units of first alarm: {triggerValueUnits}");
 ```
 
 On the first line we call `GetJsonAsync` on a request to the `alarms` endpoint.
 
-In the next 3 pairs of lines we demonstrate querying different properties like 
+In the next 3 pairs of lines we demonstrate querying different properties like
 `next` which will be a link to the next page of alarms.
 
 The `items` property returns a dynamic object that represents the collection of
@@ -149,15 +171,21 @@ to just print out the whole alarm like this:
 
 ```csharp
 var firstAlarm = alarms.items[0];
-Console.WriteLine(firstAlarm.ToString()); // Outputs "System.Dynamic.ExpandoObject"
+Console.WriteLine($"The first alarm (oops!): {firstAlarm.ToString()}"); // Outputs "System.Dynamic.ExpandoObject"
 ```
 
 Unfortunately the dynamic object returned doesn't have a useful `ToString()` method
 and we only get the type information.
 
+We can still handle this by manually serializing the object using `JsonConvert.SerializeObject`:
+
+```csharp
+Console.WriteLine($"The first alarm (much better): {JsonConvert.SerializeObject(firstAlarm, Formatting.Indented)}");
+```
+
 In the next section we'll explore an alternative approach.
 
-## Fetch Alarms and Return them as Newtonsoft JToken istances
+## Fetch Alarms and Return them as Newtonsoft JToken Instances
 
 As we saw in a previous lesson, Newtonsoft provides a nice interface for
 handling JSON instances. So we'll fetch the alarms again taking advantage of
@@ -183,7 +211,7 @@ In the first line of this snippet we tell Flurl to return the JSON as a
 those types aren't explicitly shown.
 
 When we tell Flurl to return a JToken we know it'll return the appropriate subclass
-for the data we access. We know it'll be a JObject because we know from the documentation
+for the data we access. We know it'll be a `JObject` in this example because we know from the documentation
 that a JSON object is returned from alarms.
 
 With a `JObject` instance we can use an indexer to lookup properties on that object.
@@ -193,8 +221,8 @@ Since items is a collection we know that the result returned will be a `JArray`.
 We can use an indexer on `JArray` instances and we do that (`alarmsCollection[0]`)
 to get the first alarm.
 
-Now we can print that alarm. Unlike the dyanmic object in the previous section,
-JTokens know how to convert themselves to pretty strings:
+Now we can print that alarm. Unlike the dynamic object in the previous section,
+JTokens know how to convert themselves to strings:
 
 ```json
 {
@@ -221,15 +249,16 @@ JTokens know how to convert themselves to pretty strings:
 
 Finally we show how to get just the item reference of that alarm:
 
-`var firstAlarmObjectItemReference = alarmsCollection[0]["itemReference"];
-`
+`var firstAlarmObjectItemReference = alarmsCollection[0]["itemReference"];`
 
 ## Summary
 
-In this lesson we learned how to use Flurl to return either `JToken` instances (provided by Newtonsoft) or 
+In this lesson we learned how to use Flurl to return either `JToken` instances (provided by Newtonsoft) or
 dynamic objects (provided by .Net core) to make it easier to deal with JSON.
 
 Both of these approaches work pretty well for quick and easy programming tasks.
+
+In addition, we gave some examples of working with `ExapandoObject` instances and `JToken` instances.
 
 For more involved applications you may want to create your own model classes. We'll show
 you how in Lesson 5.
