@@ -9,7 +9,7 @@ Dependencies:
 
 * .Net Core
 * Netwonsoft.Json
-* HttpClientRedirectHandler
+* [HttpClientRedirectHandler](https://www.nuget.org/packages/HttpClientRedirectHandler/) - source code at <https://github.com/metasys-server/redirect-handler/>
 
 You should be able to run this lesson by supplying a username,
 password, and host name. If everything works correctly the application
@@ -45,9 +45,9 @@ We made only slight changes to the Lesson 2 program.
 
 ## Use HttpClientRedirectHandler
 
-In lesson 2 we used an HttpClientHandler to disable autoredirects.
+In lesson 2 we used an HttpClientHandler to disable auto-redirects.
 In this lesson we'll replace the HttpClientHandler with an
-HttpClientRedirectHandler:
+HttpClientRedirectHandler and then we will no longer need to manually handle each redirect.
 
 Lesson 2 Code:
 
@@ -56,6 +56,7 @@ var handler = new HttpClientHandler {AllowAutoRedirect = false};
 
 using (var client = new HttpClient(handler) {BaseAddress = new Uri($"https://{hostname}/api/v1")})
 {
+  ...
 }
 ```
 
@@ -66,6 +67,7 @@ var handler = new HttpClientRedirectHandler();
 
 using (var client = new HttpClient(handler) {BaseAddress = new Uri($"https://{hostname}/api/v1")})
 {
+  ...
 }
 ```
 
@@ -75,14 +77,14 @@ The HttpClientRedirectHandler does the following:
 
 1. It turns off auto redirects
 2. It handles every redirect. It inspects the redirect URL and as long
-the hostname matches the hostname of the original request it automatically
-follows the redirect.
+   the hostname matches the hostname of the original request it automatically
+   follows the redirect.
+3. IT retains our authorization header on each request.
 
 ## Remove the Manual Handling of Redirects
 
-The other two changes were to delete the two lines that manually
+The other two changes we need to make are to delete the two lines that manually
 handled the redirects:
-
 
 Lesson 2 Code (Each request requires two calls):
 
@@ -102,7 +104,7 @@ var alarmsResponse = await client.GetAsync("alarms");
 alarmsResponse = await client.GetAsync(alarmsResponse.Headers.Location);
 ```
 
-Lesson 3 Code (We can again accomplish each request with one call)
+Lesson 3 Code (We can accomplish each request with one call)
 
 ```csharp
 var loginResponseMessage = await client.PostAsync("login", loginContent);
@@ -116,10 +118,10 @@ var alarmsResponse = await client.GetAsync("alarms");
 
 After this lesson, we can now quite easily make API calls.
 
-There are still some issues with our current implementaiton:
+There are still some issues with our current implementation:
 
 1. Manually reading string results after each call
 2. Manually parsing results into JSON objects after each call
 
-In Lesson 4 we'll explore two different ways to ease this using another
+In Lesson 4 we'll explore two different ways to ease these issues using another
 3rd party library named Flurl.Http.
