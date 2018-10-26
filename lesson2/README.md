@@ -12,7 +12,7 @@ You should be able to run this lesson by supplying a username,
 password, and host name. If everything works correctly the application
 will print the first alarm from the list it receives from the server.
 
-```csharp
+```shell
 $ dotnet run username password hostname
 First alarm: {
   "self": "/alarms/e3721d94-a165-46a2-8ec8-73f52752048b",
@@ -45,7 +45,7 @@ the differences.
 
 Recall from lesson 1 that even though we had an access token we couldn't fetch
 alarms. This was because on redirect our authorization header was being stripped.
-What this means is we need to stop using auto redirects. 
+What this means is we need to stop using auto redirects.
 
 We do this by configuring an HttpClientHandler and passing that to our
 HttpClient:
@@ -73,9 +73,8 @@ loginResponseMessage = await client.PostAsync(loginResponseMessage.Headers.Locat
 ```
 
 What we are doing is making the call just like we did in Program 1. But we know
-that we are going to get a redirect, and we know that the response will have a 
-Location header of the actualy URL we need to use. So the second call uses that URL.
-
+that we are going to get a redirect, and we know that the response will have a
+Location header of the actual URL we need to use. So the second call uses that URL.
 
 ## Handle the redirect on a call to alarms
 
@@ -93,10 +92,9 @@ alarmsResponse = await client.GetAsync(alarmsResponse.Headers.Location);
 
 ## Parse and Print the Response
 
-Now we actually have a response from our Alarms endpoint. We can parse it
+Now we actually have a response from our `alarms` endpoint. We can parse it
 and access one or more alarms. The response from the alarms endpoint contains
 an `items` property that contains the list of alarms.
-
 
 ```csharp
 // Parse the response using Newtonsoft and print the first one.
