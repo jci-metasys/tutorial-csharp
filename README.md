@@ -13,6 +13,8 @@ You will need
 * A Text Editor (optional)
 * Git (optional)
 
+You also need credentials for and access to a Metasys Server. 
+
 ### .NET Core
 
 All of the tutorials assume you are going to run the apps using .Net Core so this is the recommend approach.
@@ -32,7 +34,7 @@ If you already have a recent version of Visual Studio you can use that as well.
 
 ### Git Client
 
-Seting up git is outside the scope of this tutorial. There are lots of great resources 
+Setting up git is outside the scope of this tutorial. There are lots of great resources 
 at the [Git](https://git-scm.com/) website including downloads and documentation.
 
 Git isn't required to follow along so you can skip it if you wish.
