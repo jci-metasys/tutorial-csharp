@@ -25,7 +25,7 @@ namespace lesson4
             {
 
                 var loginResult = await client.Request("login")
-                    .PostJsonAsync(new {username = username, password = password})
+                    .PostJsonAsync(new {username, password})
                     .ReceiveJson();
 
                 // loginResult is a dynamic object. It has dynamic properties based on the JSON received
