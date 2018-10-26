@@ -6,18 +6,35 @@ namespace lesson5
     public class AlarmCollection
     {
         private string _next;
+        private string _previous;
+        private string _self;
 
         public int Total { get; set; }
+
+        private static string StripLeadingSlash(string value)
+        {
+            return string.IsNullOrEmpty(value) || value[0] != '/' ? value : value.Substring(0);
+        }
 
         public string Next
         {
             get => _next;
-            set => _next = value.Length > 0 && value[0] == '/' ? value.Substring(0) : value;
+            set => _next = StripLeadingSlash(value);
         }
-        public string Previous { get; set; }
-        public IList<Alarm> Items { get; set; }
-        public string Self { get; set; }
 
+        public string Previous 
+        {  
+            get => _previous;
+            set => _previous = StripLeadingSlash(value);
+        }
+
+        public string Self
+        {
+            get => _self;
+            set => _self = StripLeadingSlash(value);
+        }
+
+        public IList<Alarm> Items { get; set; }
 
         public Alarm this[int index] => Items[index];
     }
