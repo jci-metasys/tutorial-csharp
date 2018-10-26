@@ -17,13 +17,12 @@ You should see something like the following:
 
 ```bash
 $ dotnet run myname mypassword myhostname
-{ 'username': 'myname', 'mypassword': 'myhostname!' }
-eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IktJMV9tR1lNeTlUM05IdTB0TWtHd2pEbnc0MCIsImtpZCI6IktJMV9tR1lNeTlUM05IdTB0TWtHd2pEbnc0MCJ9.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdC9BUEkuQXV0aGVudGljYXRpb25TZXJ2aWNlIiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3QvQVBJLkF1dGhlbnRpY2F0aW9uU2VydmljZS9yZXNvdXJjZXMiLCJleHAiOjE1NDA0MDM2MjgsIm5iZiI6MTU0MDQwMTgyOCwiY2xpZW50X2lkIjoibWV0YXN5c191aSIsInNjb3BlIjpbIm1ldGFzeXNfYXBpIiwib2ZmbGluZV9hY2Nlc3MiLCJvcGVuaWQiXSwic3ViIjoiZGE5M2JjMTUtZjg4Mi00ODkxLTg4NTItNzJkNzVhN2Y4YWI4IiwiYXV0aF90aW1lIjoxNTQwNDAxODI4LCJpZHAiOiJpZHNydiIsIlVzZXJJZCI6IjEiLCJVc2VyTmFtZSI6Im1ldGFzeXNzeXNhZ2VudCIsIklzQWRtaW4iOiJUcnVlIiwiSXNQYXNzd29yZENoYW5nZVJlcXVpcmVkIjoiRmFsc2UiLCJJc1Rlcm1zQW5kQ29uZGl0aW9uc1JlcXVpcmVkIjoiRmFsc2UiLCJMaWNlbnNlSW5mbyI6IntcIklzTGljZW5zZWRcIjp0cnVlLFwiTGljZW5zZVR5cGVcIjpcInRlY2hcIn0iLCJDdWx0dXJlIjoiZW4tVVMiLCJhbXIiOlsicGFzc3dvcmQiXX0.AOispwmvSi7_WiTFdGiITLFfy5WDAJ52fmJX5vzjl6-erBF4a1F4DP4s4d1dz8TSTOfnMqZGhKc6F2pQE6Tkx2_xg4ju5NKg-6X3qQ1tp8IX5dUQb4_cmto1_FUpr0X8XCl0KARWQluoy65srrZv5aljNzr50jpQU3s9_ad2csD6FfuLI8w1UoM5PtOUJw5-0Rwz1hH0TqO8Mgcuq-gfZCMssIPAZGJmx4aEIzyRXy4ZMWeSWtDcMFJn9c-aS28-qwXxzgIKfR75-pQ2C2UYnnkkeqbUaSkxcZgY1pNf27qXcyoB_dwITKtWD1zPaC9BgESbdYvE75yW4WJ3e1n1fg
-Unauthorized
+The login request payload: { 'username': 'myname', 'mypassword': 'myhostname!' }
+Your accessToken was successfully retrieved. Remember to always protect your access tokens.
+Status code returned by alarms endpoint: Unauthorized
 ```
 
 The code for this program is all in one file [Program.cs](./Program.cs)
-
 
 ## Parse the command line arguments
 
@@ -112,7 +111,8 @@ The login result should be a string that look likes the following
 }
 ```
 
-(The `accessToken` was truncated in the above example for formatting reasons.)
+(The `accessToken` was truncated in the above example for formatting reasons; and also because you don't want to
+leak access tokens.)
 
 We want to get that access token. To do that we could use string methods, but it's much easier to use a
 JSON library like Newtonsoft. Therefore, we use `JToken.Parse`. The following line parses the JSON,
