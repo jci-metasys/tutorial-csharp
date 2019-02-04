@@ -17,7 +17,7 @@ You should see something like the following:
 
 ```bash
 $ dotnet run myname mypassword myhostname
-The login request payload: { 'username': 'myname', 'mypassword': 'myhostname!' }
+The login request payload: { 'username': 'myname', 'password': 'mypassword' }
 Your accessToken was successfully retrieved. Remember to always protect your access tokens.
 Status code returned by alarms endpoint: Unauthorized
 ```
