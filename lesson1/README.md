@@ -1,6 +1,7 @@
 # Lesson 1
 
-In this lesson we show you how to login and get an access token.
+In this lesson we show you how to login and get an access token. Then we'll use
+that token to retrieve a page of alarms and print the first one.
 
 Dependencies:
 
@@ -19,7 +20,26 @@ You should see something like the following:
 $ dotnet run myname mypassword myhostname
 The login request payload: { 'username': 'myname', 'password': 'mypassword' }
 Your accessToken was successfully retrieved. Remember to always protect your access tokens.
-Status code returned by alarms endpoint: Unauthorized
+First alarm: {
+  "self": "https://adx01/api/alarms/ce480de8-9e75-4525-a6a7-b163ec898ced",
+  "id": "ce480de8-9e75-4525-a6a7-b163ec898ced",
+  "itemReference": "ADX01:NAE1/FC-B.VMA-12.ZN-T",
+  "name": "ZN-T",
+  "message": "",
+  "isAckRequired": false,
+  "type": "https://adx01/api/enumSets/108/members/0",
+  "priority": 200,
+  "triggerValue": {
+    "value": "71.2",
+    "units": "https://adx01/api/enumSets/507/members/64"
+  },
+  "creationTime": "2019-03-26T04:07:33Z",
+  "isAcknowledged": false,
+  "isDiscarded": false,
+  "category": "https://adx01/api/enumSets/33/members/5",
+  "object": "https://adx01/api/objects/1c031654-9fc2-5648-883c-d202cb3bdc7d",
+  "annotations": "https://adx01/api/alarms/ce480de8-9e75-4525-a6a7-b163ec898ced/annotations"
+}
 ```
 
 The code for this program is all in one file [Program.cs](./Program.cs)
@@ -111,8 +131,7 @@ The login result should be a string that look likes the following
 }
 ```
 
-(The `accessToken` was truncated in the above example for formatting reasons; and also because you don't want to
-leak access tokens.)
+(The `accessToken` was truncated in the above example for formatting reasons; and also because you don't want to leak access tokens.)
 
 We want to get that access token. To do that we could use string methods, but it's much easier to use a
 JSON library like Newtonsoft. Therefore, we use `JToken.Parse`. The following line parses the JSON,
@@ -152,5 +171,14 @@ var alarmsResponse = await client.GetAsync("alarms");
 Notice it's much easier to make a GET call then a POST. We didn't need to format any request. We just need
 the URL fragment of the endpoint we want to call. In this case `alarms`.
 
-This call should return a `200` status code, `OK`.
+Assuming there were no problems with the previous call we can use `JObject` to parse the
+string content of the response. Then we can access the `"items"` property on the object
+which contains a list of alarms. Finally we access the first one (if the list is not empty)
+and print it.
+
+```csharp
+var alarmsObject = JObject.Parse(await alarmsResponse.Content.ReadAsStringAsync());
+var alarms = alarmsObject["items"];
+Console.WriteLine($"First alarm: {alarms?[0]}");
+```
 

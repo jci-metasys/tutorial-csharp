@@ -44,10 +44,10 @@ namespace tutorial_csharp
                 // Let's attempt to retrieve the first page of alarms
                 var alarmsResponse = await client.GetAsync("alarms");
 
-                // Oops we get a 401
-                // End of lesson
-                Console.WriteLine($"Status code returned by alarms endpoint: {alarmsResponse.StatusCode}");
-
+                // Parse the response using Newtonsoft and print the first one.
+                var alarmsObject = JObject.Parse(await alarmsResponse.Content.ReadAsStringAsync());
+                var alarms = alarmsObject["items"];
+                Console.WriteLine($"First alarm: {alarms?[0]}");
             }
 
 
