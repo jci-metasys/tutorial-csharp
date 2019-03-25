@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -17,7 +17,7 @@ namespace tutorial_csharp
             var hostname = args[2];
 
 
-            using (var client = new HttpClient {BaseAddress = new Uri($"https://{hostname}/api/v1")})
+            using (var client = new HttpClient {BaseAddress = new Uri($"https://{hostname}/api/v2")})
             {
                 // Login - constructing a payload that looks like { "username": "thename', "password": "thepassword" }
                 var loginMessage = $"{{ 'username': '{username}', 'password': '{password}' }}";
