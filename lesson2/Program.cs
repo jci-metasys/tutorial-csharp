@@ -16,9 +16,7 @@ namespace lesson2
             var password = args[1];
             var hostname = args[2];
 
-            var handler = new HttpClientHandler {AllowAutoRedirect = false};
-
-            using (var client = new HttpClient(handler) {BaseAddress = new Uri($"https://{hostname}/api/v2")})
+            using (var client = new HttpClient {BaseAddress = new Uri($"https://{hostname}/api/v2")})
             {
                 // Login - constructing a payload that looks like { "username": "thename', "password": "thepassword" }
                 var loginMessage = $"{{ 'username': '{username}', 'password': '{password}' }}";
@@ -48,10 +46,6 @@ namespace lesson2
                 var alarms = alarmsObject["items"];
                 Console.WriteLine($"First alarm: {alarms?[0]}");
             }
-
-
-
         }
-
     }
 }
