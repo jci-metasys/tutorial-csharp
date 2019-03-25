@@ -39,7 +39,7 @@ var hostname = args[2];
 Next we create an HttpClient
 
 ```csharp
-using (var client = new HttpClient {BaseAddress = new Uri($"https://{hostname}/api/v1")})
+using (var client = new HttpClient {BaseAddress = new Uri($"https://{hostname}/api/v2")})
 {
     ...
 }
@@ -141,9 +141,9 @@ So we set this header as follows:
 client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {accessToken}");```
 ```
 
-## Attempt to Make Another Call
+## Make Another Call
 
-Finally we attempt to make another call:
+Finally we use the token we just retrieved to make another call:
 
 ```csharp
 var alarmsResponse = await client.GetAsync("alarms");
@@ -152,10 +152,5 @@ var alarmsResponse = await client.GetAsync("alarms");
 Notice it's much easier to make a GET call then a POST. We didn't need to format any request. We just need
 the URL fragment of the endpoint we want to call. In this case `alarms`.
 
-Unfortunately this call will return a `401` status code, `Unauthorized`.
+This call should return a `200` status code, `OK`.
 
-Why? The reason is a little complicated. First you should know that the server's response to any call is to return a redirect. These are instructions from the server to the client stating that the URL they attempted to access has been moved to a different location. By default, HttpClient will follow these redirects automatically for you.
-But for security reasons, it strips off the Authorization header we just constructed. So the call fails and tells you
-that you are unauthorized.
-
-Go on to Lesson 2 where we'll demonstrate our first method for resolving this issue.
