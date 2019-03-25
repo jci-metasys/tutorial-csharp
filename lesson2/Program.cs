@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -18,7 +18,7 @@ namespace lesson2
 
             var handler = new HttpClientHandler {AllowAutoRedirect = false};
 
-            using (var client = new HttpClient(handler) {BaseAddress = new Uri($"https://{hostname}/api/v1")})
+            using (var client = new HttpClient(handler) {BaseAddress = new Uri($"https://{hostname}/api/v2")})
             {
                 // Login - constructing a payload that looks like { "username": "thename', "password": "thepassword" }
                 var loginMessage = $"{{ 'username': '{username}', 'password': '{password}' }}";
@@ -28,10 +28,6 @@ namespace lesson2
                     "application/json");
 
                 var loginResponseMessage = await client.PostAsync("login", loginContent);
-
-                // Handle the redirect
-                loginResponseMessage = await client.PostAsync(loginResponseMessage.Headers.Location, loginContent);
-
 
                 // Read the results
                 var loginResult = await loginResponseMessage.Content.ReadAsStringAsync();
@@ -46,10 +42,6 @@ namespace lesson2
 
                 // Let's attempt to retrieve the first page of alarms
                 var alarmsResponse = await client.GetAsync("alarms");
-
-
-                // Handle the redirect
-                alarmsResponse = await client.GetAsync(alarmsResponse.Headers.Location);
 
                 // Parse the response using Newtonsoft and print the first one.
                 var alarmsObject = JObject.Parse(await alarmsResponse.Content.ReadAsStringAsync());
