@@ -7,11 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="HttpClientFactory.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="HttpClientRedirectHandler.Flurl" Version="1.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Flurl" Version="2.8.2" />
+    <PackageReference Include="Flurl.Http" Version="2.4.0" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace lesson5
+namespace lesson3
 {
     public class AlarmCollection
     {
