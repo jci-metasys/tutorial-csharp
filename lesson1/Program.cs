@@ -5,17 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace tutorial_csharp
+namespace lesson1
 {
     public class Program
     {
-
         public static async Task Main(string[] args)
         {
             var username = args[0];
             var password = args[1];
             var hostname = args[2];
-
 
             using (var client = new HttpClient {BaseAddress = new Uri($"https://{hostname}/api/v2")})
             {
@@ -28,7 +26,6 @@ namespace tutorial_csharp
                     "application/json");
 
                 var loginResponseMessage = await client.PostAsync("login", loginContent);
-
 
                 // Read the results
                 var loginResult = await loginResponseMessage.Content.ReadAsStringAsync();
@@ -49,10 +46,6 @@ namespace tutorial_csharp
                 var alarms = alarmsObject["items"];
                 Console.WriteLine($"First alarm: {alarms?[0]}");
             }
-
-
-
         }
-
     }
 }

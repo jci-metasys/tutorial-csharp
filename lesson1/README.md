@@ -27,18 +27,18 @@ First alarm: {
   "name": "ZN-T",
   "message": "",
   "isAckRequired": false,
-  "type": "https://adx01/api/enumSets/108/members/0",
+  "typeUrl": "https://adx01/api/enumSets/108/members/0",
   "priority": 200,
   "triggerValue": {
     "value": "71.2",
-    "units": "https://adx01/api/enumSets/507/members/64"
+    "unitsUrl": "https://adx01/api/enumSets/507/members/64"
   },
   "creationTime": "2019-03-26T04:07:33Z",
   "isAcknowledged": false,
   "isDiscarded": false,
-  "category": "https://adx01/api/enumSets/33/members/5",
-  "object": "https://adx01/api/objects/1c031654-9fc2-5648-883c-d202cb3bdc7d",
-  "annotations": "https://adx01/api/alarms/ce480de8-9e75-4525-a6a7-b163ec898ced/annotations"
+  "categoryUrl": "https://adx01/api/enumSets/33/members/5",
+  "objectUrl": "https://adx01/api/objects/1c031654-9fc2-5648-883c-d202cb3bdc7d",
+  "annotationsUrl": "https://adx01/api/alarms/ce480de8-9e75-4525-a6a7-b163ec898ced/annotations"
 }
 ```
 
@@ -73,7 +73,7 @@ the hostname.
 In this section we'll see how to construct a login request, send it to the server
 and then retrieve the access token from the server's response.
 
-If you look at the [documentation](https://metasys-server.github.io/api-docs/#/reference/authentication/login/login) for
+If you look at the [documentation](https://metasys-server.github.io/api-landing/api/v2/#/reference/authentication/login/login) for
 the login API you see that we need to construct a JSON payload that looks like the following:
 
 ```json
@@ -144,12 +144,12 @@ var accessToken = JToken.Parse(loginResult)["accessToken"].Value<string>();
 ## Set the Authorization Header for future requests
 
 Every other request we make needs the access token in an Authorization header. This is documented
-on every call. See [Get Alarms](https://metasys-server.github.io/api-landing/api/alderaan/#/reference/alarms/get-alarms/get-alarms) for an example.
+on every call. See [Get Alarms](https://metasys-server.github.io/api-landing/api/v2/#/reference/alarms/get-alarms/get-alarms) for an example.
 If you look in the right hand pane and scroll down a bit you'll see the Headers:
 
 <img alt="Request Headers" src="./images/headers.png" width=400px>
 
-The Accept header is optional as explained in the [versioning section](https://metasys-server.github.io/api-landing/api/alderaan/#/introduction/api-version). We are choosing to use the URL
+The Accept header is optional as explained in the [versioning section](https://metasys-server.github.io/api-landing/api/v1/#/introduction/api-version/api-version-notes). We are choosing to use the URL
 to specify version.
 
 The Authorization header is not optional. It must be on every request.
@@ -181,4 +181,3 @@ var alarmsObject = JObject.Parse(await alarmsResponse.Content.ReadAsStringAsync(
 var alarms = alarmsObject["items"];
 Console.WriteLine($"First alarm: {alarms?[0]}");
 ```
-
