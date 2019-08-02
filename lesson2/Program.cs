@@ -1,50 +1,68 @@
 using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
+using Flurl.Http;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace lesson2
 {
     public class Program
     {
-
         public static async Task Main(string[] args)
         {
             var username = args[0];
             var password = args[1];
             var hostname = args[2];
 
-            using (var client = new HttpClient {BaseAddress = new Uri($"https://{hostname}/api/v2")})
+            string accessToken;
+
+            using (var client = new FlurlClient($"https://{hostname}/api/v2"))
             {
-                // Login - constructing a payload that looks like { "username": "thename', "password": "thepassword" }
-                var loginMessage = $"{{ 'username': '{username}', 'password': '{password}' }}";
+                var loginResult = await client.Request("login")
+                    .PostJsonAsync(new {username, password})
+                    .ReceiveJson();
 
-                var loginContent = new StringContent(loginMessage,
-                    Encoding.UTF8,
-                    "application/json");
+                // loginResult is a dynamic object. It has dynamic properties based on the JSON received
+                accessToken = loginResult.accessToken;
+            }
 
-                var loginResponseMessage = await client.PostAsync("login", loginContent);
+            // Create a new client that has the OAuthHeader set on each request.
+            using (var client = new FlurlClient($"https://{hostname}/api/v2").WithOAuthBearerToken(accessToken))
+            {
+                var alarms = await client.Request("alarms").GetJsonAsync();
 
-                // Read the results
-                var loginResult = await loginResponseMessage.Content.ReadAsStringAsync();
+                // Again alarms is a dynamic object, we can query for any property
+                // defined in the schema
 
-                // Get the access token
-                // We could use string manipulation methods, but using JSON.NET is much easier
-                var accessToken = JToken.Parse(loginResult)["accessToken"].Value<string>();
+                var nextPageUrl = alarms.next;
+                Console.WriteLine($"The next page of alarms url: {nextPageUrl}");
 
-                // Add an authorization header to the list of default headers for our client
-                client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {accessToken}");
+                var firstAlarmItemReference = alarms.items[0].itemReference;
+                Console.WriteLine($"The item reference of the first alarm: {firstAlarmItemReference}");
 
+                var triggerValueUnits = alarms.items[0].triggerValue.unitsUrl;
+                Console.WriteLine($"The trigger value unitsUrl of first alarm: {triggerValueUnits}");
+                
+                // But the bad thing is if we just want to get an Alarm
+                // it doesn't work like we want
+                var firstAlarm = alarms.items[0];
+                Console.WriteLine($"The first alarm (oops!): {firstAlarm.ToString()}"); // Outputs "System.Dynamic.ExpandoObject"
 
-                // Let's attempt to retrieve the first page of alarms
-                var alarmsResponse = await client.GetAsync("alarms");
+                Console.WriteLine($"The first alarm (much better): {JsonConvert.SerializeObject(firstAlarm, Formatting.Indented)}");
 
-                // Parse the response using Newtonsoft and print the first one.
-                var alarmsObject = JObject.Parse(await alarmsResponse.Content.ReadAsStringAsync());
-                var alarms = alarmsObject["items"];
-                Console.WriteLine($"First alarm: {alarms?[0]}");
+                // So an alternative is to ues GetJsonAsync<JToken> which returns JTokens as defined
+                // by Newtonsoft. To illustrate let's fetch the alarms again
+
+                var alarmsObject = await client.Request("alarms").GetJsonAsync<JToken>();
+
+                // Now we can treat alarms as a dictionary
+                var alarmsCollection = alarmsObject["items"]; // Returns a JArray since items is a collection
+                var firstAlarmObject = alarmsCollection[0]; // Returns a JObject since each alarm is an object
+
+                Console.WriteLine($"The first alarm (using JToken): {firstAlarmObject}");
+
+                var firstAlarmObjectItemReference = alarmsCollection[0]["itemReference"];
+                Console.WriteLine($"The item reference of the first alarm: {firstAlarmObjectItemReference}");
             }
         }
     }
