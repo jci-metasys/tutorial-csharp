@@ -1,3 +1,5 @@
+This repo is being archived. It was written for v1 of the API (which shipped with Metasys Server 10). It may be updated at a future date to show how to use the API with a newer version.
+
 # Tutorial for C#
 
 All of the lessons in this repository take advantage of the latest version of .Net
